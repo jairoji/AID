@@ -1,0 +1,31 @@
+---
+title: "TP 5 AID"
+author: "Jairo Jiménez"
+date: "30 de junio de 2015"
+output: html_document
+---
+
+Ejercicio 1
+Un investigador estudio el contenido en sodio de las marcas de cerveza comercializadas en Capital Federal y Gran Buenos Aries. Para ello, selecciono las 6 marcas más prestigiosas del mercado y eligió botellas o latas de 500ml de cada marca seleccionada y midió el contenido en sodio (en miligramos) de cada una de ellas. Los resultados de este muestreo fueron lossiguientes:
+
+```{r}
+library(readxl)
+Cerveza = read_excel("cerveza.xls")
+names(Cerveza) = c("Sodio", "Marca", "Promedio_Marca", "Res.med")
+```
+
+
+
+```{r}
+library(ggplot2)
+ggplot(data = Cerveza, aes(x = Marca, y = Sodio)) + geom_boxplot()
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+library(ggplot2)
+ggplot(data = Cerveza, aes(x = Marca, y = Sodio)) + geom_boxplot()
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
