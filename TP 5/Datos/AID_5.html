@@ -67,32 +67,32 @@ img {
 </div>
 
 
-<div id="ejercicio-1" class="section level2">
-<h2>Ejercicio 1</h2>
-<div id="estableciendo-directorio-de-trabajo-cargando-librerias-y-leyendo-los-datos" class="section level3">
-<h3>Estableciendo directorio de trabajo, cargando librerías y leyendo los datos</h3>
-<pre class="r"><code>setwd(&quot;/run/media/ahriman/Stuff/MDMKD/Primer\ cuatrimestre/AID/TP\ 5/Datos&quot;)
-library(readxl)
-library(psych)
-library(ggplot2)</code></pre>
+<div id="cargando-librerias" class="section level2">
+<h2>Cargando librerías</h2>
+<pre class="r"><code>library(readxl)   #Para leer los archivos de excel
+library(psych)    #Para calcular las estadísticas por grupo
+library(ggplot2)  #Para graficar</code></pre>
 <pre><code>## 
 ## Attaching package: 'ggplot2'
 ## 
 ## The following object is masked from 'package:psych':
 ## 
 ##     %+%</code></pre>
+</div>
+<div id="ejercicio-1" class="section level2">
+<h2>Ejercicio 1</h2>
+<div id="lectura-de-los-datos" class="section level4">
+<h4>Lectura de los datos</h4>
 <pre class="r"><code>Cerveza = read_excel(&quot;cerveza.xls&quot;)
 names(Cerveza) = c(&quot;Sodio&quot;, &quot;Marca&quot;, &quot;Promedio_Marca&quot;, &quot;Res.med&quot;)</code></pre>
 </div>
-<div id="literal-a" class="section level3">
-<h3>Literal a</h3>
-<p>Graficar la variable observada en los grupos y analizar la presencia de outliers y la igualdad grafica de las medias y las formas de las distribuciones.</p>
+<div id="a-graficar-la-variable-observada-en-los-grupos-y-analizar-la-presencia-de-outliers-y-la-igualdad-grafica-de-las-medias-y-las-formas-de-las-distribuciones." class="section level4">
+<h4>a) Graficar la variable observada en los grupos y analizar la presencia de outliers y la igualdad grafica de las medias y las formas de las distribuciones.</h4>
 <pre class="r"><code>ggplot(data = Cerveza, aes(x = Marca, y = Sodio)) + geom_boxplot()</code></pre>
 <p><img src="data:image/png;base64,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" title alt width="672" /></p>
 </div>
-<div id="literal-b" class="section level3">
-<h3>Literal b</h3>
-<p>Calcular la media y el desvio de cada uno de los grupos. ¿Le parece que se satisface el supuesto de homogeneidad?</p>
+<div id="b-calcular-la-media-y-el-desvio-de-cada-uno-de-los-grupos.-le-parece-que-se-satisface-el-supuesto-de-homogeneidad" class="section level4">
+<h4>b) Calcular la media y el desvio de cada uno de los grupos. ¿Le parece que se satisface el supuesto de homogeneidad?</h4>
 <pre class="r"><code>describeBy(Cerveza$Sodio, group = Cerveza$Marca, mat = T)[,c(&quot;group1&quot;, &quot;mean&quot;, &quot;sd&quot;)]</code></pre>
 <pre><code>##     group1    mean        sd
 ## 11 Marca 1 23.6375 1.1648881
@@ -102,34 +102,147 @@ names(Cerveza) = c(&quot;Sodio&quot;, &quot;Marca&quot;, &quot;Promedio_Marca&qu
 ## 15 Marca 5 14.2125 0.8131728
 ## 16 Marca 6 20.4125 0.7790791</code></pre>
 </div>
-<div id="literal-c" class="section level3">
-<h3>Literal c</h3>
-<p>Establecer las hipótesis estadísticas de interés.</p>
+<div id="c-establecer-las-hipotesis-estadisticas-de-interes." class="section level4">
+<h4>c) Establecer las hipótesis estadísticas de interés.</h4>
 </div>
-<div id="literal-d" class="section level3">
-<h3>Literal d</h3>
-<p>Contrastar las hipótesis con un nivel <span class="math">\(\alpha\)</span> = 0.05.</p>
+<div id="d-contrastar-las-hipotesis-con-un-nivel-alpha-0.05." class="section level4">
+<h4>d) Contrastar las hipótesis con un nivel <span class="math">\(\alpha\)</span> = 0.05.</h4>
 </div>
-<div id="literal-e" class="section level3">
-<h3>Literal e</h3>
-<p>Verificar el cumplimiento de los supuestos de normalidad y homocedasticidad.</p>
+<div id="e-verificar-el-cumplimiento-de-los-supuestos-de-normalidad-y-homocedasticidad." class="section level4">
+<h4>e) Verificar el cumplimiento de los supuestos de normalidad y homocedasticidad.</h4>
 </div>
-<div id="literal-f" class="section level3">
-<h3>Literal f</h3>
-<p>Si se verifican concluir en el contexto del problema.</p>
+<div id="f-si-se-verifican-concluir-en-el-contexto-del-problema." class="section level4">
+<h4>f) Si se verifican concluir en el contexto del problema.</h4>
 </div>
 </div>
 <div id="ejercicio-2" class="section level2">
 <h2>Ejercicio 2</h2>
+<pre class="r"><code>Datos = c(3.3, 4.6, 6.7, 6.3, 4.4, 4.5, 5.8, 6.0, 4.9, 5.0, 5.0, 6.7, 4.9, 4.0, 4.8, 5.5, 3.9, 4.5, 5.3, 6.6, 4.2, 5.2, 6.2, 6.1, 4.7, 4.9, 5.0, 5.3, 5.1, 5.5, 6.4, 6.5, 4.6, 4.8, 5.9, 6.3, 4.5, 5.3, 5.4, 6.8)
+Datos = matrix(Datos, ncol = 4, byrow = T )
+colnames(Datos) = c(&quot;S1&quot;, &quot;S2&quot;, &quot;S3&quot;, &quot;S4&quot;)
+Datos</code></pre>
+<pre><code>##        S1  S2  S3  S4
+##  [1,] 3.3 4.6 6.7 6.3
+##  [2,] 4.4 4.5 5.8 6.0
+##  [3,] 4.9 5.0 5.0 6.7
+##  [4,] 4.9 4.0 4.8 5.5
+##  [5,] 3.9 4.5 5.3 6.6
+##  [6,] 4.2 5.2 6.2 6.1
+##  [7,] 4.7 4.9 5.0 5.3
+##  [8,] 5.1 5.5 6.4 6.5
+##  [9,] 4.6 4.8 5.9 6.3
+## [10,] 4.5 5.3 5.4 6.8</code></pre>
+<div id="a-realice-un-analisis-grafico-y-descriptivo-de-la-eficiencia-de-conversion-lograda-por-los-distintos-suplementos." class="section level4">
+<h4>a) Realice un análisis gráfico y descriptivo de la eficiencia de conversión lograda por los distintos suplementos.</h4>
+</div>
+<div id="b-establezca-las-hipotesis-de-interes-del-problema-y-explicite-los-supuestos-necesarios." class="section level4">
+<h4>b) Establezca las hipótesis de interés del problema y explicite los supuestos necesarios.</h4>
+</div>
+<div id="c-testee-las-hipotesis-al-5." class="section level4">
+<h4>c) Testee las hipótesis al 5%.</h4>
+</div>
+<div id="d-analice-el-cumplimiento-de-los-supuestos-del-modelo." class="section level4">
+<h4>d) Analice el cumplimiento de los supuestos del modelo.</h4>
+</div>
+<div id="e-concluya-en-terminos-del-problema-y-si-rechazo-h_0-indique-cuales-medias-son-diferentes.-utilice-para-ello-las-comparaciones-a-posteriori-de-tuckey." class="section level4">
+<h4>e) Concluya en términos del problema y si rechazó <span class="math">\(H_0\)</span>, indique cuales medias son diferentes. Utilice para ello las comparaciones a posteriori de Tuckey.</h4>
+</div>
 </div>
 <div id="ejercicio-3" class="section level2">
 <h2>Ejercicio 3</h2>
+<pre class="r"><code>Datos = matrix(c(2.50, 0.13, 2.82, 0.20, 3.20, 0.17), ncol = 2, byrow = T)
+colnames(Datos) = c(&quot;Media&quot;, &quot;Desviación&quot;)
+rownames(Datos) = c(&quot;Placebo&quot;, &quot;Aspirina&quot;, &quot;Droga&quot;)
+Datos</code></pre>
+<pre><code>##          Media Desviación
+## Placebo   2.50       0.13
+## Aspirina  2.82       0.20
+## Droga     3.20       0.17</code></pre>
+<div id="identifique-la-variable-dependiente-y-el-factor-de-interes." class="section level4">
+<h4>1. Identifique la variable dependiente y el factor de interes.</h4>
+</div>
+<div id="escriba-el-modelo-en-general-y-en-terminos-del-problema." class="section level4">
+<h4>2. Escriba el modelo, en general y en términos del problema.</h4>
+</div>
+<div id="analice-los-resultados-de-las-pruebas-de-hipotesis-para-los-supuestos-del-modelo." class="section level4">
+<h4>3. Analice los resultados de las pruebas de hipótesis para los supuestos del modelo.</h4>
+</div>
+<div id="plantee-las-hipotesis-y-construya-la-tabla-de-anova-sabiendo-que-sc_error-sum-n_i--1-s_i2" class="section level4">
+<h4>4. Plantee las hipótesis y construya la tabla de Anova sabiendo que <span class="math">\[SC_{error} = \sum (n_i -1) s_i^2 \]</span></h4>
+</div>
+<div id="compare-los-tratamientos-y-utilizando-un-test-t-con-nivel-global-0.05-es-decir-que-como-son-3-comparaciones-alpha-frac0.053-para-cada-una." class="section level4">
+<h4>5. Compare los tratamientos y utilizando un test t con nivel global 0.05 es decir que como son 3 comparaciones <span class="math">\(\alpha = \frac{0.05}{3}\)</span> para cada una.</h4>
+</div>
+<div id="adicionalmente-se-indago-a-los-pacientes-sobre-efectos-colaterales-gastricos-como-respuesta-al-tratamiento.-los-encuestados-respondieron-segun-una-escala-entre-0-y-5-0-nunca-5-siempre.-los-resultados-obtenidos-fueron" class="section level4">
+<h4>6. Adicionalmente se indagó a los pacientes sobre efectos colaterales gástricos como respuesta al tratamiento. Los encuestados respondieron según una escala entre 0 y 5 (0 = nunca, 5= siempre). Los resultados obtenidos fueron:</h4>
+<pre class="r"><code>Tabla = matrix(c(0, 3, 2, 3, 4, 2, 2, 3, 1, 1, 1, 4, 3, 0, 2, 3, 4, 5, 2, 3, 4, 5, 4, 2, 3, 4, 1, 5, 3, 0), nrow = 3, byrow = T)
+rownames(Tabla) = c(&quot;Placebo&quot;, &quot;Aspirina&quot;, &quot;Droga&quot;)
+Tabla</code></pre>
+<pre><code>##          [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+## Placebo     0    3    2    3    4    2    2    3    1     1
+## Aspirina    1    4    3    0    2    3    4    5    2     3
+## Droga       4    5    4    2    3    4    1    5    3     0</code></pre>
+</div>
+<div id="cree-que-los-investigadores-deberian-utilizar-la-misma-prueba-estadistica-que-la-empleada-para-comparar-el-tiempo-libre-de-dolor-justifique." class="section level4">
+<h4>6.1 ¿Cree que los investigadores deberían utilizar la misma prueba estadística que la empleada para comparar el tiempo libre de dolor? Justifique.</h4>
+</div>
+<div id="cuales-son-las-conclusiones-de-este-estudio" class="section level4">
+<h4>6.2 ¿Cuáles son las conclusiones de este estudio?</h4>
+</div>
 </div>
 <div id="ejercicio-4" class="section level2">
 <h2>Ejercicio 4</h2>
+<pre class="r"><code>Datos = matrix(c(25, 121, 81, 25, 36, 36, 81, 25, 36, 36, 36, 36, 25, 64, 9, 25, 36, 36, 25, 36, 16, 81, 36, 25, 25, 49, 9, 25, 36, 25, 49, 25, 49, 64, 169, 25, 36, 49, 1, 25, 25, 121, 81, 25), ncol = 4, byrow = T)
+colnames(Datos) = c(&quot;Grupo A&quot;, &quot;Grupo B&quot;, &quot;Grupo C&quot;, &quot;Grupo D&quot;)
+Datos</code></pre>
+<pre><code>##       Grupo A Grupo B Grupo C Grupo D
+##  [1,]      25     121      81      25
+##  [2,]      36      36      81      25
+##  [3,]      36      36      36      36
+##  [4,]      25      64       9      25
+##  [5,]      36      36      25      36
+##  [6,]      16      81      36      25
+##  [7,]      25      49       9      25
+##  [8,]      36      25      49      25
+##  [9,]      49      64     169      25
+## [10,]      36      49       1      25
+## [11,]      25     121      81      25</code></pre>
+<div id="a-grafique-los-tiempos-de-coccion-por-tratamiento.-calcule-las-medidas-resumen-de-los-mismos." class="section level4">
+<h4>a) Grafique los tiempos de cocción por tratamiento. Calcule las medidas resumen de los mismos.</h4>
+</div>
+<div id="b-establezca-las-hipotesis-de-interes-escriba-el-modelo-detallando-los-supuestos." class="section level4">
+<h4>b) Establezca las hipótesis de interés, escriba el modelo detallando los supuestos.</h4>
+</div>
+<div id="c-realice-la-prueba-y-el-diagnostico-correspondiente.-son-validos-los-resultados-de-la-prueba" class="section level4">
+<h4>c) Realice la prueba y el diagnostico correspondiente. ¿Son válidos los resultados de la prueba?</h4>
+</div>
+<div id="d-si-respondio-afirmativamente-en-c-concluya-en-el-contexto-del-problema.-si-concluyo-negativamente-intente-una-transformacion-de-potencia-conveniente-para-normalizar-yo-homocedastizar-la-variable-respuesta." class="section level4">
+<h4>d) Si respondió afirmativamente en c) concluya en el contexto del problema. Si concluyo negativamente intente una transformación de potencia conveniente para normalizar y/o homocedastizar la variable respuesta.</h4>
+</div>
+<div id="e-realice-nuevamente-la-prueba-si-fuera-necesario-y-el-diagnostico-del-modelo-correspondiente.-concluya-en-terminos-del-problema." class="section level4">
+<h4>e) Realice nuevamente la prueba si fuera necesario y el diagnóstico del modelo correspondiente. Concluya en términos del problema.</h4>
+</div>
+<div id="f-compare-los-resultados-con-los-del-test-no-parametrico." class="section level4">
+<h4>f) Compare los resultados con los del test no paramétrico.</h4>
+</div>
 </div>
 <div id="ejercicio-5" class="section level2">
 <h2>Ejercicio 5</h2>
+<pre class="r"><code>Datos = matrix(c(84.99, 84.02, 84.38, 85.15, 85.13, 84.88, 84.72, 84.48, 85.16, 84.2, 84.1, 84.55), nrow = 4, byrow = T)
+rownames(Datos) = c(&quot;Analista 1&quot;, &quot;Analista 2&quot;, &quot;Analista 3&quot;, &quot;Analista 4&quot;)
+colnames(Datos) = c(&quot;Muestra_1&quot;, &quot;Muestra_2&quot;, &quot;Muestra_3&quot;)
+Datos</code></pre>
+<pre><code>##            Muestra_1 Muestra_2 Muestra_3
+## Analista 1     84.99     84.02     84.38
+## Analista 2     85.15     85.13     84.88
+## Analista 3     84.72     84.48     85.16
+## Analista 4     84.20     84.10     84.55</code></pre>
+<div id="a-por-que-no-es-adecuado-aplicar-en-este-caso-el-analisis-de-la-varianza-parametrico" class="section level4">
+<h4>a) ¿Por qué no es adecuado aplicar en este caso el análisis de la varianza paramétrico?</h4>
+</div>
+<div id="b-mediante-la-prueba-no-parametrica-de-kruskall-wallis-determinar-si-el-depende-del-analista." class="section level4">
+<h4>b) Mediante la prueba no paramétrica de Kruskall-Wallis, determinar si el % depende del analista.</h4>
+</div>
 </div>
 
 

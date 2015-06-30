@@ -1,0 +1,111 @@
+---
+title: "TP 5 AID"
+author: "Jairo Jiménez"
+date: "30 de junio de 2015"
+output: html_document
+---
+
+##Cargando librerías
+```{r}
+library(readxl)   #Para leer los archivos de excel
+library(psych)    #Para calcular las estadísticas por grupo
+library(ggplot2)  #Para graficar
+```
+
+## Ejercicio 1
+####Lectura de los datos
+```{r}
+Cerveza = read_excel("cerveza.xls")
+names(Cerveza) = c("Sodio", "Marca", "Promedio_Marca", "Res.med")
+```
+
+####a) Graficar la variable observada en los grupos y analizar la presencia de outliers y la igualdad grafica de las medias y las formas de las distribuciones.
+```{r}
+ggplot(data = Cerveza, aes(x = Marca, y = Sodio)) + geom_boxplot()
+```
+
+####b) Calcular la media y el desvio de cada uno de los grupos. ¿Le parece que se satisface el supuesto de homogeneidad?
+```{r}
+describeBy(Cerveza$Sodio, group = Cerveza$Marca, mat = T)[,c("group1", "mean", "sd")]
+```
+
+####c) Establecer las hipótesis estadísticas de interés.
+
+####d) Contrastar las hipótesis con un nivel $\alpha$ = 0.05.
+
+####e) Verificar el cumplimiento de los supuestos de normalidad y homocedasticidad.
+
+####f) Si se verifican concluir en el contexto del problema.
+
+##Ejercicio 2
+```{r}
+Datos = c(3.3, 4.6, 6.7, 6.3, 4.4, 4.5, 5.8, 6.0, 4.9, 5.0, 5.0, 6.7, 4.9, 4.0, 4.8, 5.5, 3.9, 4.5, 5.3, 6.6, 4.2, 5.2, 6.2, 6.1, 4.7, 4.9, 5.0, 5.3, 5.1, 5.5, 6.4, 6.5, 4.6, 4.8, 5.9, 6.3, 4.5, 5.3, 5.4, 6.8)
+Datos = matrix(Datos, ncol = 4, byrow = T )
+colnames(Datos) = c("S1", "S2", "S3", "S4")
+Datos
+```
+
+####a) Realice un análisis gráfico y descriptivo de la eficiencia de conversión lograda por los distintos suplementos.
+
+####b) Establezca las hipótesis de interés del problema y explicite los supuestos necesarios.
+
+####c) Testee las hipótesis al 5%.
+
+####d) Analice el cumplimiento de los supuestos del modelo.
+
+####e) Concluya en términos del problema y si rechazó $H_0$, indique cuales medias son diferentes. Utilice para ello las comparaciones a posteriori de Tuckey.
+
+
+##Ejercicio 3
+```{r}
+Datos = matrix(c(2.50, 0.13, 2.82, 0.20, 3.20, 0.17), ncol = 2, byrow = T)
+colnames(Datos) = c("Media", "Desviación")
+rownames(Datos) = c("Placebo", "Aspirina", "Droga")
+Datos
+```
+
+####1.  Identifique la variable dependiente y el factor de interes.
+####2.  Escriba el modelo, en general y en términos del problema.
+####3.  Analice los resultados de las pruebas de hipótesis para los supuestos del modelo.
+####4.  Plantee las hipótesis y construya la tabla de Anova sabiendo que $$SC_{error} = \sum (n_i -1) s_i^2 $$
+####5.  Compare los tratamientos y utilizando un test t con nivel global 0.05 es decir que como son 3 comparaciones $\alpha = \frac{0.05}{3}$ para cada una.
+####6.  Adicionalmente se indagó a los pacientes sobre efectos colaterales gástricos como respuesta al tratamiento. Los encuestados respondieron según una escala entre 0 y 5 (0 = nunca, 5= siempre). Los resultados obtenidos fueron:
+
+```{r}
+Tabla = matrix(c(0, 3, 2, 3, 4, 2, 2, 3, 1, 1, 1, 4, 3, 0, 2, 3, 4, 5, 2, 3, 4, 5, 4, 2, 3, 4, 1, 5, 3, 0), nrow = 3, byrow = T)
+rownames(Tabla) = c("Placebo", "Aspirina", "Droga")
+Tabla
+```
+####6.1 ¿Cree que los investigadores deberían utilizar la misma prueba estadística que la empleada para comparar el tiempo libre de dolor? Justifique.
+####6.2 ¿Cuáles son las conclusiones de este estudio?
+
+
+
+##Ejercicio 4
+```{r}
+Datos = matrix(c(25, 121, 81, 25, 36, 36, 81, 25, 36, 36, 36, 36, 25, 64, 9, 25, 36, 36, 25, 36, 16, 81, 36, 25, 25, 49, 9, 25, 36, 25, 49, 25, 49, 64, 169, 25, 36, 49, 1, 25, 25, 121, 81, 25), ncol = 4, byrow = T)
+colnames(Datos) = c("Grupo A", "Grupo B", "Grupo C", "Grupo D")
+Datos
+```
+
+
+
+####a) Grafique los tiempos de cocción por tratamiento. Calcule las medidas resumen de los mismos.
+####b) Establezca las hipótesis de interés, escriba el modelo detallando los supuestos.
+####c) Realice la prueba y el diagnostico correspondiente. ¿Son válidos los resultados de la prueba?
+####d) Si respondió afirmativamente en c) concluya en el contexto del problema. Si concluyo negativamente intente una transformación de potencia conveniente para normalizar y/o homocedastizar la variable respuesta.
+####e) Realice nuevamente la prueba si fuera necesario y el diagnóstico del modelo correspondiente. Concluya en términos del problema.
+####f) Compare los resultados con los del test no paramétrico.
+
+
+##Ejercicio 5
+```{r}
+Datos = matrix(c(84.99, 84.02, 84.38, 85.15, 85.13, 84.88, 84.72, 84.48, 85.16, 84.2, 84.1, 84.55), nrow = 4, byrow = T)
+rownames(Datos) = c("Analista 1", "Analista 2", "Analista 3", "Analista 4")
+colnames(Datos) = c("Muestra_1", "Muestra_2", "Muestra_3")
+Datos
+```
+
+
+####a) ¿Por qué no es adecuado aplicar en este caso el análisis de la varianza paramétrico?
+####b) Mediante la prueba no paramétrica de Kruskall-Wallis, determinar si el % depende del analista.
