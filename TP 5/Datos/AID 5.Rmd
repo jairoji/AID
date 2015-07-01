@@ -10,34 +10,138 @@ output: html_document
 library(readxl)   #Para leer los archivos de excel
 library(psych)    #Para calcular las estadísticas por grupo
 library(ggplot2)  #Para graficar
+library(nortest)  #Para hacer las pruebas de hipótesis de normalidad
+library(lawstat)  #Prueba de Levene
+library(reshape)  #Manejo de datos
 ```
 
 ## Ejercicio 1
+
+Un investigador estudió el contenido en sodio de las marcas de cerveza comercializadas en Capital Federal y Gran Buenos Aires. Para ello, selecciono las 6 marcas más prestigiosas del mercado y eligió botellas o latas de 500ml de cada marca seleccionada y midió el contenido en sodio (en miligramos) de cada una de ellas. Los resultados de este muestreo fueron los siguientes:
+
+
 ####Lectura de los datos
 ```{r}
 Cerveza = read_excel("cerveza.xls")
 names(Cerveza) = c("Sodio", "Marca", "Promedio_Marca", "Res.med")
+head(Cerveza)
 ```
 
 ####a) Graficar la variable observada en los grupos y analizar la presencia de outliers y la igualdad grafica de las medias y las formas de las distribuciones.
 ```{r}
-ggplot(data = Cerveza, aes(x = Marca, y = Sodio)) + geom_boxplot()
+ggplot(data = Cerveza, aes(x = Marca, y = Sodio, fill = Marca)) + geom_boxplot()
 ```
+
+* Las marcas que presentan valores atípicos son las marcas 3 y 6.
+* En el gráfico hay una diferencia notable entre las medias de cada una de las marcas.
+* Las distribuciones son sesgadas para las marcas 1, 2 y 5. Para las marcas 3, 4 y 6, las distribuciones parecen ser simétricas, lo que indica diferencias en las varianzas.
 
 ####b) Calcular la media y el desvio de cada uno de los grupos. ¿Le parece que se satisface el supuesto de homogeneidad?
 ```{r}
 describeBy(Cerveza$Sodio, group = Cerveza$Marca, mat = T)[,c("group1", "mean", "sd")]
 ```
 
+Al parecer no se satisface el supuesto de homogeneidad, pues las varianzas son muy diferentes entre sí.
+
 ####c) Establecer las hipótesis estadísticas de interés.
+* Hipótesis nula: 
+
+Los promedios de contenido de sodio en cada una de las marcas son iguales:
+
+$H_0: \mu_1 = \mu_2 = \dots = \mu_n = \mu$ 
+
+* Hipótesis alternativa:
+
+Existe al menos un promedio de contenido de sodio que es diferente de los demás
+
+$H_a: \exists \mu_i \neq \mu$, $i = 1, \dots , n$
 
 ####d) Contrastar las hipótesis con un nivel $\alpha$ = 0.05.
+```{r}
+(Cerveza.AOV = aov(data = Cerveza, Sodio ~ Marca))
+summary(Cerveza.AOV)
+```
+
+Se añade la columna de residuales a la matriz de datos de cerveza para su uso posterior en las pruebas de homocedasticidad.
+
+```{r}
+Cerveza = cbind(Cerveza, residuals(Cerveza.AOV))
+colnames(Cerveza)[5] = "Anova.Residuales"
+```
+
+
+Existe evidencia estadística para rechazar la hipótesis nula con un valor $\alpha = 0.05$, es decir, las medias son diferentes. Es necesario analizar los supuestos de la prueba antes de concluir.
 
 ####e) Verificar el cumplimiento de los supuestos de normalidad y homocedasticidad.
+Para verificar el supuesto de normalidad se usan las siguientes pruebas:
 
-####f) Si se verifican concluir en el contexto del problema.
+* Anderson-Darling
+```{r}
+ad.test(Cerveza$Anova.Residuales)
+```
+
+* Lilliefors (Kolmogorov-Smirnov)
+```{r}
+lillie.test(Cerveza$Anova.Residuales)
+```
+
+
+* Shapiro-Wilks
+```{r}
+shapiro.test(Cerveza$Anova.Residuales)
+```
+
+* Cramer Von Misses
+```{r}
+cvm.test(Cerveza$Anova.Residuales)
+```
+
+* Gráfico Cuantil-Cuantil
+```{r}
+qqnorm(Cerveza$Anova.Residuales)
+qqline(Cerveza$Anova.Residuales)
+```
+
+
+No existe suficiente evidencia estadística para rechazar la hipótesis de normalidad en los residuales del modelo con ninguno de los test presentados anteriormente.
+
+Para verificar la hipótesis de homocedasticidad de los datos, se usan los siguientes test:
+
+* Test de Levene
+```{r}
+levene.test(Cerveza$Anova.Residuales, Cerveza$Marca)
+```
+
+* Test de Bartlett
+```{r}
+bartlett.test(Cerveza$Anova.Residuales, Cerveza$Marca)
+```
+
+No existe evidencia estadística para rechazar la hipótesis de homocedasticidad.
+
+####f) Si se verifican, concluir en el contexto del problema.
+Como las hipótesis de la anova se satisfacen, se concluye que existen diferencias en las medias de los datos presentados.
+
+```{r}
+TukeyHSD(Cerveza.AOV)
+```
+
+De acuerdo a la prueba de Tukey, las únicas marcas que no presentan diferencias significativas son las marcas 3 y 6, es decir, estas contienen contenidos similares de sodio, mientras que las demás no.
 
 ##Ejercicio 2
+Para comparar cuatro suplementos “de engorde” en bovinos para carne, se seleccionaron, al azar, cuarenta animales Hereford de iguales edad y sexo, y de pesos homogéneos para ser usados en un experimento.
+
+Suplemento 1 (S1) estuvo constituido por grano partido y fuente A.
+
+Suplemento 2 (S2) por grano partido y fuente B.
+
+Suplemento 3 (S3) por grano entero y fuente A.
+
+Suplemento 4 (S4) por grano entero y fuente B.
+
+Se asignaron aleatoriamente 10 animales por suplemento, los que fueron alimentados individualmente con una dieta estándar más el correspondiente suplemento durante 80 días. La variable en estudio (o respuesta) fue la eficiencia de conversión (EfCon) individual (kg Materia Seca/ kg Ganancia de Peso) cuyos registros se presentan en la siguiente tabla:
+
+
 ```{r}
 Datos = c(3.3, 4.6, 6.7, 6.3, 4.4, 4.5, 5.8, 6.0, 4.9, 5.0, 5.0, 6.7, 4.9, 4.0, 4.8, 5.5, 3.9, 4.5, 5.3, 6.6, 4.2, 5.2, 6.2, 6.1, 4.7, 4.9, 5.0, 5.3, 5.1, 5.5, 6.4, 6.5, 4.6, 4.8, 5.9, 6.3, 4.5, 5.3, 5.4, 6.8)
 Datos = matrix(Datos, ncol = 4, byrow = T )
@@ -47,9 +151,38 @@ Datos
 
 ####a) Realice un análisis gráfico y descriptivo de la eficiencia de conversión lograda por los distintos suplementos.
 
+```{r}
+Datos.Formato1 = melt(Datos)
+Datos.Formato1 = Datos.Formato1[,-1]
+colnames(Datos.Formato1) = c("Suplemento", "EfCon")
+head(Datos.Formato1)
+ggplot(data = Datos.Formato1, aes(y = EfCon, x = Suplemento, fill = Suplemento)) + geom_boxplot()
+describeBy(Datos.Formato1$EfCon, Datos.Formato1$Suplemento, mat =T)[,c("group1", "mean", "sd")]
+```
+
+
 ####b) Establezca las hipótesis de interés del problema y explicite los supuestos necesarios.
 
+* Hipótesis nula: 
+
+Los promedios de eficiencia de conversión para los suplementos son iguales.
+
+$H_0: \mu_1 = \mu_2 = \dots = \mu_n = \mu$ 
+
+* Hipótesis alternativa:
+
+Existe al menos un promedio de eficiencia de conversión que es diferente de los demás.
+
+$H_a: \exists \mu_i \neq \mu$, $i = 1, \dots , n$
+
+
+
+
 ####c) Testee las hipótesis al 5%.
+```{r}
+(Datos.Formato1.AOV = aov(data = Datos.Formato1, EfCon ~ Suplemento))
+summary(Datos.Formato1.AOV)
+```
 
 ####d) Analice el cumplimiento de los supuestos del modelo.
 
@@ -108,4 +241,7 @@ Datos
 
 
 ####a) ¿Por qué no es adecuado aplicar en este caso el análisis de la varianza paramétrico?
+
+Para el análisis de varianza paramétrico se debe satisfacer el supuesto de normalidad en los residuales, sin embargo, las pruebas existentes son sensibles cuando se tienen muchos o muy pocos datos. [Ver R Bloggers](http://www.r-bloggers.com/normality-tests-don%E2%80%99t-do-what-you-think-they-do/)
+
 ####b) Mediante la prueba no paramétrica de Kruskall-Wallis, determinar si el % depende del analista.
