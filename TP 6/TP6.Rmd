@@ -1,0 +1,59 @@
+---
+title: "TP 6"
+author: "Jairo Jiménez"
+date: "2 de julio de 2015"
+output: html_document
+---
+
+```{r, echo = F}
+setwd("/run/media/ahriman/Stuff/MDMKD/Primer\ cuatrimestre/AID/TP 6/AID_TP_6_Datos")
+```
+
+##Cargando librerías
+
+```{r}
+library(readxl)
+library(xlsx)
+library(ggplot2)
+```
+
+##Ejercicio 1
+
+####Lectura de los datos
+
+```{r}
+Gorriones = read.xlsx("Gorriones.xlsx", sheetIndex = 1)
+```
+
+##Ejercicio 2
+
+####Lectura de los datos
+
+```{r}
+Hemofilia = read_excel("hemofilia.xls")
+```
+
+##Ejercicio 3
+
+####Lectura de los datos
+
+```{r}
+Pulso = read_excel("pulso.xls")
+```
+
+##Ejercicio 4
+
+####Lectura de los datos
+
+```{r}
+Iris = read.table("Iris.txt", header = T, dec = ",")
+```
+
+
+##Ejercicio 5
+
+####Lectura de los datos
+
+```{r}
+Barotro = read.table("Barotro2.dat", header = T, dec = ",")
+```
