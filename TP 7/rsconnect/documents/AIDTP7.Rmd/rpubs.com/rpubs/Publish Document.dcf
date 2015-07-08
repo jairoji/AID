@@ -1,0 +1,7 @@
+name: Publish Document
+account: rpubs
+server: rpubs.com
+bundleId:
+        https://api.rpubs.com/api/v1/document/91305/aa00df0b2e9747bb86e4cd461a60ffd7
+url: http://rpubs.com/jairoji/91305
+when: 1436326833.73537

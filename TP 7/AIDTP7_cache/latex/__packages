@@ -1,0 +1,17 @@
+base
+FactoMineR
+foreign
+psych
+knitr
+xtable
+dendextend
+Rcpp
+dendextendRcpp
+ggplot2
+scales
+proto
+ggfortify
+corrplot
+Stuff
+dplyr
+broom

@@ -1,6 +1,6 @@
 ---
-title: "TP 5 AID"
-author: "Jairo Jiménez"
+title: "TP 5 AID - ANOVA"
+author: "JJ"
 date: "30 de junio de 2015"
 output: html_document
 ---
@@ -284,7 +284,7 @@ En ninguno de los dos casos se rechaza la respectiva hipótesis nula, es decir, 
 ```{r, echo = F}
 X.bar = (10*sum(Datos[,"Media"]))/30
 SSB = 10*sum((Datos[,"Media"]-X.bar)^2)/2
-S_p = sum(Datos[,"Desviación"])*9/27
+S_p = sum((Datos[,"Desviación"])^2)*9/27
 estadistico.F = SSB/S_p
 ```
 
@@ -314,8 +314,8 @@ Prueba.t = function(D1, D2, n1, n2, alfa){
   dist.t = qt(1-alfa, gl)
   h = ifelse(valor.t > dist.t, "Rechazo", "No rechazo")
   names(h) = NULL
-  Resultado.p = as.data.frame(matrix(c(round(valor.t, 4), round(dist.t, 4), round(alfa, 4)), nrow = 1))
-  colnames(Resultado.p) = c("Valor observado", "Valor teórico t", "Alfa")
+  Resultado.p = as.data.frame(matrix(c(round(valor.t, 4), round(dist.t, 4), round(s_a2, 4), round(alfa, 4)), nrow = 1))
+  colnames(Resultado.p) = c("Valor observado", "Valor teórico t", "s_a2", "Alfa")
   Resultado = list(Resultado = Resultado.p, Decision = h)
   return(Resultado)
 }

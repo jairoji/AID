@@ -1,0 +1,403 @@
+---
+title: "TP 7 - Clusters"
+author: "JJ"
+date: "4 de julio de 2015"
+output: 
+  html_document:
+      toc: true 
+      toc_depth: 4  
+      theme: journal
+      highlight: tango
+---
+
+```{r}
+setwd("/run/media/ahriman/Stuff/MDMKD/Primer\ cuatrimestre/AID/TP\ 7")
+```
+
+
+
+```{r}
+library(FactoMineR)
+library(foreign)
+library(psych)
+library(knitr)
+library(xtable)
+suppressPackageStartupMessages(library(dendextend))
+suppressPackageStartupMessages(library(dendextendRcpp))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggfortify))
+library(corrplot)
+library(Stuff)
+suppressPackageStartupMessages(library(dplyr))
+library(broom)
+```
+
+```{r, echo = F}
+opts_chunk$set(comment="", message=FALSE,tidy.opts=list(keep.blank.line=TRUE, width.cutoff=120),options(width=100), cache=TRUE,fig.align='center',fig.height=6, fig.width=10,fig.path='figure/beamer-',fig.show='hold',size='footnotesize', cache=TRUE)
+```
+
+##Ejercicio 1
+
+Dado el conjunto de datos representado por la matriz:
+
+```{r}
+X = matrix(c(1,2,5,6,3,4,3,4,0,1,2,1), ncol = 2)
+rownames(X) = c(1:nrow(X))
+colnames(X) = paste("X", 1:2, sep = "")
+kable(X, align = c("c", "c"))
+plot(X[,1], X[,2])
+text(X[,1], X[,2], labels = rownames(X), pos = 2)
+```
+
+####i. Grafique en R2 y construya el dendrograma correspondiente utilizando el criterio del vecino más lejano (utilizar la distancia euclídea).
+
+Vecino más lejano:
+
+```{r}
+X.clust.com = as.dendrogram(hclust(dist(X, "euclidean"), method = "complete")) %>% set("branches_lwd", 2)
+plot(X.clust.com)
+```
+
+####ii. Igual que el anterior, utilizando el criterio de vecino más cercano.
+
+Vecino más cercano:
+
+```{r}
+X.clust.sin = as.dendrogram(hclust(dist(X, "euclidean"), method = "single")) %>% set("branches_lwd", 2)
+plot(X.clust.sin)
+```
+
+####iii. Repita el item 1.i. pero aplicando el criterio promedio
+
+Promedio:
+
+```{r}
+X.clust.avg = as.dendrogram(hclust(dist(X, "euclidean"), method = "average")) %>% set("branches_lwd", 2)
+plot(X.clust.avg)
+```
+
+####iv. Repita el ejercicio utilizando las variables estandarizadas. Compare los resultados.
+
+Normalización de los datos:
+
+```{r}
+X.scale = scale(X)
+```
+
+Datos escalados, vecino más lejano:
+
+```{r}
+X.clust.scale.com = as.dendrogram(hclust(dist(X.scale, "euclidean"), method = "complete")) %>% set("branches_lwd", 2)
+tanglegram(dendlist("Normalizado" = X.clust.scale.com, "Original" = X.clust.com))
+```
+
+Datos escalados, vecino más cercano:
+
+```{r}
+X.clust.scale.sin = as.dendrogram(hclust(dist(X.scale, "euclidean"), method = "single")) %>% set("branches_lwd", 2)
+tanglegram(dendlist("Normalizado" = X.clust.scale.sin, "Original" = X.clust.sin))
+```
+
+Datos escalados, promedio:
+
+```{r}
+X.clust.scale.avg = as.dendrogram(hclust(dist(X.scale, "euclidean"), method = "average")) %>% set("branches_lwd", 2)
+tanglegram(dendlist("Normalizado" = X.clust.scale.avg, "Original" = X.clust.avg))
+```
+
+En los 3 casos los resultados son iguales.
+
+#Ejercicio 2
+
+Dada la siguiente matriz de distancias, realice los dendrogramas correspondientes a los métodos: _Escriba aquí la ecuación_. vecino más cercano, vecino más lejano y promedio. (distancia euclídea)
+
+
+```{r}
+d2 = matrix(c(0, 4, 18, 20, 18, 4, 0, 10, 15, 20, 18, 10, 0, 24, 8, 20, 15, 24, 0, 6, 18, 20, 8, 6, 0), ncol = 5)
+colnames(d2) = paste("E", 1:ncol(d2), sep = "")
+rownames(d2) = paste("E", 1:ncol(d2), sep = "")
+kable(d2, align = "c")
+d2 = as.dist(d2)
+```
+
+Vecino más cercano:
+
+```{r}
+d2.clust.sin = as.dendrogram(hclust(d2, method = "single")) %>% set("branches_lwd", 2)
+d2.clust.com = as.dendrogram(hclust(d2, method = "complete")) %>% set("branches_lwd", 2)
+d2.clust.avg = as.dendrogram(hclust(d2, method = "average")) %>% set("branches_lwd", 2)
+d2.dend = dendlist("Cercano" = d2.clust.sin, "Lejano" = d2.clust.com, "Promedio" = d2.clust.avg)
+```
+
+Para encontrar las diferencias entre los dendrogramas se calculan las correlaciones entre ellos. Estas correlaciones se presentan en el siguiente gráfico:
+
+```{r}
+corrplot(cor.dendlist(d2.dend), "pie", "lower")
+```
+
+El gráfico anterior permite observar que el dendrograma cercano es diferente de los otros dos dendrogramas (vecino más lejano y promedio) los cuales son iguales. Para observar las diferencias entre los dendrogramas se seleccionaron el dendrograma del vecino más lejano y el del vecino más cercano, los cuales se presentan en el siguiente "tanglegram" (¿Enredograma?)
+
+```{r}
+tanglegram(d2.dend, which = c(1, 2))
+```
+
+Las diferencias entre los dos dendrogramas están en la unión del elemento 3 con los grupos formados por 1-2 y 4-5, en el caso del vecino más cercano, se ve que este elemento se une primero a 4-5, mientras que en el dendrograma del vecino más lejano, este se une primero a 1-2.
+
+
+#Ejercicio 3
+
+Si se desea obtener cinco agrupamientos de los datos correspondientes a la tabla ‘pizzas’:
+
+```{r}
+pizzas = read.spss("pizzas.sav", to.data.frame = T)
+pizzas = pizzas[,c("PH", "PROT", "GRA", "CEN", "SOD", "CARB", "CAL")]
+```
+
+####i. Realice un Análisis en Componentes Principales. ¿Qué proporción de la variabilidad total en las variables medidas explican las dos primeras componentes?
+
+```{r}
+PCA.pizzas = PCA(pizzas[,c("PH", "PROT", "GRA", "CEN", "SOD", "CARB", "CAL")], graph = F)
+kable(head(PCA.pizzas$eig, 2), align = "c")
+```
+
+Las primeras dos componentes del ACP explican el 90.3% de la variabilidad total.
+
+Utilizando un gráfico de individuos determinar grupos en los datos. ¿Cuántos grupos hay?
+
+```{r}
+ggplot(data = PCA.pizzas$ind$coord, aes(x = Dim.1, y = Dim.2)) + geom_point() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw()
+```
+
+En este gráfico se observan entre 5 y 6 grupos.
+
+####¿Cuáles pizzas pertenecen a cuáles agrupamientos? Comparar con el ítem anterior. 
+
+Cada grupo y sus respectivos elementos están en la siguiente tabla:
+
+```{r}
+grupos = as.data.frame(cutree(as.dendrogram(hclust(dist(PCA.pizzas$ind$coord[,c(1:2)]), "complete")) %>% set("branches_lwd", 2), 5))
+colnames(grupos) = "Grupo"
+```
+Grupo 1
+
+```{r}
+as.numeric(rownames(subset(grupos, Grupo == 1)))
+```
+
+Grupo 2
+
+```{r}
+as.numeric(rownames(subset(grupos, Grupo == 2)))
+```
+
+Grupo 3
+
+```{r}
+as.numeric(rownames(subset(grupos, Grupo == 3)))
+```
+
+Grupo 4
+
+```{r}
+as.numeric(rownames(subset(grupos, Grupo == 4)))
+```
+
+Grupo 5
+
+```{r}
+as.numeric(rownames(subset(grupos, Grupo == 5)))
+```
+
+
+
+
+####ii. Aplique un método de agrupamiento a los resultados del ítem anterior (valores de los casos sobre las componentes).
+
+Vecino más cercano:
+
+```{r}
+PCA.pizzas.clust.sin = as.dendrogram(hclust(dist(PCA.pizzas$ind$coord[,c(1:2)]), "single")) %>% set("branches_lwd", 2)
+PCA.pizzas.clust.comp = as.dendrogram(hclust(dist(PCA.pizzas$ind$coord[,c(1:2)]), "complete")) %>% set("branches_lwd", 2)
+PCA.pizzas.clust.avg = as.dendrogram(hclust(dist(PCA.pizzas$ind$coord[,c(1:2)]), "average")) %>% set("branches_lwd", 2)
+PCA.pizzas.clust = dendlist("Cercano" = PCA.pizzas.clust.sin, "Lejano" = PCA.pizzas.clust.comp, "Promedio" =
+                              PCA.pizzas.clust.avg)
+par(mar = c(5, 4, 2, 2), mfrow = c(3, 1))
+plot(PCA.pizzas.clust.comp %>% set("branches_k_color", k=5) %>% set("branches_lwd", 2), main = "Lejano")
+plot(PCA.pizzas.clust.sin %>% set("branches_k_color", k=5) %>% set("branches_lwd", 2), main = "Cercano")
+plot(PCA.pizzas.clust.avg %>% set("branches_k_color", k=5) %>% set("branches_lwd", 2), main = "Promedio")
+par(mfrow = c(1,1))
+```
+####iii. Aplique el método de K-Medias a los datos de manera de obtener 5 grupos. Compare con los resultados anteriores.
+
+Para comparar los resultados se utilizan los grupos encontrados por cada uno de los métodos jerárquicos, representandolos en las dos primeras componentes obtenidas del ACP.
+
+```{r}
+# cálculos de diferentes tamaños de grupos del algoritmo k means
+PCA.1.2 = PCA.pizzas$ind$coord[,c(1:2)]
+kclusts <- data.frame(k=1:9) %>% group_by(k) %>% do(kclust=kmeans(pizzas, .$k))
+clusters <- kclusts %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
+assignments <- kclusts %>% group_by(k) %>% do(augment(.$kclust[[1]], PCA.1.2))
+clusterings <- kclusts %>% group_by(k) %>% do(glance(.$kclust[[1]]))
+# Será usado el de 5 para este ejercicio, el resto serán usandos en el literal iv.
+set.seed(NULL)
+pizzas.clust.sin = as.factor(cutree(as.dendrogram(hclust(dist(pizzas), "single")), 5))
+pizzas.clust.comp = as.factor(cutree(as.dendrogram(hclust(dist(pizzas), "complete")), 5))
+pizzas.clust.avg = as.factor(cutree(as.dendrogram(hclust(dist(pizzas), "average")), 5))
+k4 = ggplot(PCA.1.2, aes(x = Dim.1, y = Dim.2), theme = NULL) + geom_point(size = 3, color = subset(assignments, k == 5)$.cluster) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw() + ggtitle("Kmeans")
+k1 = ggplot(PCA.1.2, aes(x = Dim.1, y = Dim.2), theme = NULL) + geom_point(size = 3, color = pizzas.clust.sin) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw() + ggtitle("Vecino más cercano")
+k2 = ggplot(PCA.1.2, aes(x = Dim.1, y = Dim.2), theme = NULL) + geom_point(size = 3, color = pizzas.clust.comp) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw() + ggtitle("Vecino más lejano")
+k3 = ggplot(PCA.1.2, aes(x = Dim.1, y = Dim.2), theme = NULL) + geom_point(size = 3, color = pizzas.clust.avg) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw() + ggtitle("Promedio")
+multiplot(k4, k1, k2, k3, cols = 2)
+```
+
+En los cuatro casos se obtienen los mismos resultados.
+
+####iv. Resuma los resultados: ¿tienen los datos una estructura como para agruparlos? En el caso de que su respuesta sea afirmativa: ¿en cuántos grupos le parece más conveniente? Justifique.
+
+Las componentes principales mostradas en el literal i. muestran una partición de entre 5 y 6 grupos, sin embargo, para tener certeza sobre el número de grupos adecuado, se exploran diferentes tamaños de grupos:
+
+```{r}
+p1 <- ggplot(assignments, aes(Dim.1, Dim.2)) + geom_point(aes(color=.cluster), size = 4) + facet_wrap(~ k) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw()
+p1
+```
+
+Como recurso adicional para encontrar el número de grupos, se grafican las sumas dentro de los grupos en función del número de grupos:
+
+```{r}
+ggplot(clusterings, aes(k, tot.withinss)) + geom_line() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw()
+```
+
+Este gráfico ratifica una vez más que el número adecuado de grupos es 5.
+
+#Ejercicio 5
+
+Queremos agrupar a 6 alumnos de primero de psicología en base a sus notas en las asignaturas del área de básica (X1), del área de metodología (X2), del área de evolutiva (X3), del área de social (X4) y del área de clínica (X5). Para ello hemos realizado la media por área y hemos obtenido la siguiente matriz:
+
+```{r}
+Datos = matrix(c(8, 9, 7, 8, 6, 7, 8, 7, 8, 8, 2, 3, 8, 7, 2, 1, 2, 6, 7, 1, 1, 1, 1, 9, 8, 2, 3, 1, 8, 9), ncol = 5, byrow = T)
+colnames(Datos) = paste("X", 1:ncol(Datos), sep = "")
+rownames(Datos) = paste("S", 1:nrow(Datos), sep = "")
+kable(Datos, align = "c")
+```
+
+Con los datos de la matriz anterior realizar los dendogramas, utilizando el método de Ward:
+
+####a) Para los datos crudos
+
+```{r}
+Datos.clust = as.dendrogram(hclust(dist(Datos, "euclidean"), method = "ward.D")) %>% set("branches_lwd", 2)
+plot(Datos.clust)
+```
+
+####b) Para los datos estandarizados por variable
+
+```{r}
+Datos.scale = scale(Datos)
+Datos.scale.clust = as.dendrogram(hclust(dist(Datos.scale, "euclidean"), method = "ward.D")) %>% set("branches_lwd", 2)
+plot(Datos.scale.clust)
+```
+
+####c) ¿A qué se deben las diferencias observadas en los dendrogramas?
+
+```{r}
+tanglegram(dendlist("Estandarizados" = Datos.scale.clust, "Originales" = Datos.clust))
+```
+
+Al parecer las diferencias se deben a que las distancias entre grupos son tan altas que una pequeña variación en la escala modifica la forma en la cual se hacen los conglomerados.
+
+####d) Cuál de las alternativas seleccionaría teniendo en cuenta este coeficiente y la interpretabilidad de los resultados.
+
+Los datos originales muestran una mejor discriminación entre los grupos, en el dendrograma anterior, se observa que las dos últimas uniones están mejor separadas en el caso de los datos originales, mientras que en el caso de los datos estandarizados, lasúltimas dos uniones suceden casi a la misma altura.
+
+#Ejercicio 6
+
+```{r}
+Paises = c("Albania", "Austria", "Bélgica", "Bulgaria", "Checosl", "Dinamarca", "AlemaniaE", "Finlandia",
+           "Francia", "Grecia", "Hungría", "Irlanda", "Italia", "P.Bajos", "Noruega", "Polonia", "Portugal",
+           "Rumania", "España", "Suecia", "Suiza", "Inglaterra", "Rusia", "AlemaniaO")
+
+Proteinas = c("C.Vacuna", "C.Cerdo", "Huevos", "Leche", "Pescado", "Cereal", "Embutidos", "F.Secos", "FrutasVeg")
+
+Consumo = matrix(c(10.1, 1.4, 0.5, 8.9, 0.2, 42.3, 0.6, 5.5, 1.7, 8.9, 14, 4.3, 19.9, 2.1, 28, 3.6, 1.3, 4.3, 13.5, 9.3, 4.1, 17.5, 4.5, 26.6, 5.7, 2.1, 4, 7.8, 6, 1.6, 8.3, 1.2, 56.7, 1.1, 3.7, 4.2, 9.7, 11.4, 2.8, 12.5, 2, 34.3, 5, 1.1, 4, 10.6, 10.8, 3.7, 25, 9.9, 21.9, 4.8, 0.7, 2.4, 8.4, 11.6, 3.7, 11.1, 5.4, 24.6, 6.5, 0.8, 3.6, 9.5, 4.9, 2.7, 33.7, 5.8, 26.3, 5.1, 1, 1.4, 18, 9.9, 3.3, 19.5, 5.7, 28.1, 4.8, 2.4, 6.5, 10.2, 3, 2.8, 17.6, 5.9, 41.7, 2.2, 7.8, 6.5, 5.3, 12.4, 2.9, 9.7, 0.3, 40.1, 4, 5.4, 4.2, 13.9, 10, 4.7, 25.8, 2.2, 24, 6.2, 1.6, 2.9, 9, 5.1, 2.9, 13.7, 3.4, 36.8, 2.1, 4.3, 6.7, 9.5, 13.6, 3.6, 23.4, 2.5, 22.4, 4.2, 1.8, 3.7, 9.4, 4.7, 2.7, 23.3, 9.7, 23, 4.6, 1.6, 2.7, 6.9, 10.2, 2.7, 19.3, 3, 36.1, 5.9, 2, 6.6, 6.2, 3.7, 1.1, 4.9, 14.2, 27, 5.9, 4.7, 7.9, 6.2, 6.3, 1.5, 11.1, 1, 49.6, 3.1, 5.3, 2.8, 7.1, 3.4, 3.1, 8.6, 7, 29.2, 5.7, 5.9, 7.2, 9.9, 7.8, 3.5, 24.7, 7.5, 19.5, 3.7, 1.4, 2, 13.1, 10.1, 3.1, 23.8, 2.3, 25.6, 2.8, 2.4, 4.9, 17.4, 5.7, 4.7, 20.6, 4.3, 24.3, 4.7, 3.4, 3.3, 9.3, 4.6, 2.1, 16.6, 3, 43.6, 6.4, 3.4, 2.9, 11.4, 12.5, 4.1, 18.8, 3.4, 18.6, 5.2, 1.5, 3.8), ncol = 9, byrow = T)
+rownames(Consumo) = Paises
+colnames(Consumo) = Proteinas
+kable(Consumo, align = "c")
+```
+
+####a- Utilizando el método de Ward y la distancia euclídea particionar en dos clusters. Como llamaría a cada uno de ellos? 
+
+```{r}
+Consumo.clust = as.dendrogram(hclust(dist(Consumo, "euclidean"), method = "ward.D"))
+plot(Consumo.clust %>% set("branches_k_color", k=2) %>% set("branches_lwd", 2), main = "Ward 2 Grupos")
+Consumo.clust.2 = cutree(Consumo.clust, k = 2)
+Consumo2g = cbind(Consumo, Consumo.clust.2)
+Consumo2g[, "Consumo.clust.2"] = as.factor(Consumo2g[, "Consumo.clust.2"])
+caracterizacion2g = cbind(describeBy(Consumo2g, "Consumo.clust.2", mat = T)[1:18, c("group1", "mean", "sd")], rep(colMeans(Consumo), each = 2))
+colnames(caracterizacion2g)[4] = "Promedio Gen"
+kable(caracterizacion2g, align = "c")
+```
+
+En base a las medidas calculadas para los dos grupos, se observa que el primer grupo está caracterizado por aquellos países que consumen menos carnes en general pero más frutas y verduras, el grupo dos es el caso contrario, en el cual se consume mucha carne y menos frutas y verduras.
+
+* Grupo 1 = Carnívoros
+* Grupo 2 = Frugívoros
+
+####b- Idem a- pero en cuatro clusters. Utilizando el dendograma, con cuál de las clasificaciones se quedaría? 
+
+```{r}
+plot(Consumo.clust %>% set("branches_k_color", k=4) %>% set("branches_lwd", 2), main = "Ward 4 Grupos")
+```
+
+```{r}
+Consumo.clust.4 = cutree(Consumo.clust, k = 4)
+Consumo4g = cbind(Consumo, Consumo.clust.4)
+Consumo4g[, "Consumo.clust.4"] = as.factor(Consumo4g[, "Consumo.clust.4"])
+Caracterizacion4g = cbind(describeBy(Consumo4g, "Consumo.clust.4", mat = T)[, c("group1", "mean", "sd")][1:36,], rep(colMeans(Consumo), each = 4))
+colnames(Caracterizacion4g)[4] = "Promedio Gen"
+kable(Caracterizacion4g, align = "c")
+```
+
+La partición en dos grupos es más clara, pues permite interpretar fácilmente las características de los grupos, mientras que la partición en 4 grupos presenta mezclas en las características de las variables que representan a cada grupo.
+
+####c- Realice una caracterización de las variables.
+
+
+Los grupos están caracterizados de la siguiente manera:
+
+* Grupo 1: alto consumo de cereal, frutos secos y frutas y vegetales,
+* Grupo 2: alto comsumo de pescados y carnes, consumo promedio de embutidos y leche, consumo bajo de frutos secos y frutas y vegetales.
+* Grupo 3: alto consumo de cereal, consumo promedio de frutos secos, consumo bajo de frutas y vegetales.
+* Grupo 4: alto consumo de frutos secos, frutas y vegetales, pescado y embutidos.
+
+
+####d- Compare los resultados obtenidos con el de componentes principales.
+```{r}
+Consumo.PCA = PCA(Consumo, graph = F)
+kable(head(Consumo.PCA$eig), align = "c")
+```
+
+Para la comparación se toman las 3 primeras componentes principales, las cuales explican el 74% de la varianza.
+
+La primera componente
+
+```{r}
+P1 = PCbiplot2(Consumo.PCA, size.obs.text = 3) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw()
+P2 = PCbiplot2(Consumo.PCA, y= "Dim.3", size.obs.text = 3) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + theme_bw()
+multiplot(P1, P2, cols = 2)
+```
+
+```{r}
+kable(Consumo.PCA$var$cos2[,1:3])
+```
+
+El primer factor está caracterizado por las variables asociadas al consumo de carne vacuna, huevo, leche, embutidos, frutos secos y cereal. Este factor contrapone el consumo de proteína de origen animal con el de proteína de origen vegetal. Entre los países que tienen alto consumo de proteína animal, se encuentran Dinamarca, Bélgica e Irlanda, mientras que entre los que tienen alto consumo de proteína vegetal, se encuentran Grecia, Bulgaria y Albania.
+
+El segundo factor se caracteríza por el consumo de pescado y frutas y vegetales, siendo los países de alto consumo España, Portugal y Noruega.
+
+El tercer factor, se caracteríza por los países con alto consumo de carne de cerdo, aunque esta variable también está bien representada en el primer factor, por lo que, es posible mezclarlos en uno solo aunque este factor también muestra que hay países que consumen mucha carne de cerdo y tienen un consumo bajo de carne de vaca y leche, entre estos países se encuentran Hungría y Polonia.
+
+Con la información encontrada por el Análisis de componentes principales y las clasificaciones jerárquicas hechas en los literales anteriores, es recomendable usar solamente dos clusters.
+
+#Notas
+* Introducción a [dendextend](http://cran.r-project.org/web/packages/dendextend/vignettes/introduction.html)
+* Gráficos de [kmeans](http://cran.r-project.org/web/packages/broom/vignettes/kmeans.html)

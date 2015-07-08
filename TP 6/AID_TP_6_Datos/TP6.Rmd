@@ -1,20 +1,32 @@
 ---
-title: "TP 6"
-author: "Jairo Jiménez"
+title: "TP 6 - Análisis Discriminante"
+author: "JJ"
 date: "2 de julio de 2015"
-output: html_document
+output: 
+  html_document:
+      toc: true 
+      toc_depth: 4  
+      theme: journal
+      highlight: tango
 ---
 
 ```{r, echo = F}
 setwd("/run/media/ahriman/Stuff/MDMKD/Primer\ cuatrimestre/AID/TP 6/AID_TP_6_Datos")
 ```
 
-##Cargando librerías
-
 ```{r}
 library(readxl)
-library(xlsx)
+suppressPackageStartupMessages(library(xlsx))
 library(ggplot2)
+library(Stuff)
+library(knitr)
+library(reshape)
+suppressPackageStartupMessages(library(psych))
+suppressPackageStartupMessages(library(caret))
+```
+
+```{r, echo = T}
+opts_chunk$set(comment="", message=FALSE,tidy.opts=list(keep.blank.line=TRUE, width.cutoff=120),options(width=100), cache=TRUE,fig.align='center',fig.height=6, fig.width=10,fig.path='figure/beamer-',fig.show='hold',size='footnotesize', cache=TRUE)
 ```
 
 #Ejercicio 1
@@ -25,15 +37,41 @@ La base de datos Gorriones.xls consiste en 49 registros de gorriones sobre los q
 
 ```{r}
 Gorriones = read.xlsx("Gorriones.xlsx", sheetIndex = 1)
-Gorriones[,ncol(Gorriones)] = as.factor(Gorriones[,ncol(Gorriones)])
-head(Gorriones)
+Gorriones = Gorriones[, -1]
+colnames(Gorriones) = c("L.Total", "E.Alar", "L.Pico.y.Cabeza", 
+"L.Húmero", "L.Quilla.Esternón", "Vivo.Muerto")
+Gorriones[, "Vivo.Muerto"] = replace(Gorriones[, "Vivo.Muerto"], which(Gorriones[, "Vivo.Muerto"] == -1), 0)
+Gorriones[["Vivo.Muerto"]] = as.factor(Gorriones[["Vivo.Muerto"]])
+levels(Gorriones[["Vivo.Muerto"]]) = c("Muerto", "Vivo")
+kable(head(Gorriones), align = "c")
 ```
 
 #### i. Compare las medias de cada una de las variables entre los grupos. Realice una exploración grafica.
 
+```{r}
+g1 = ggplot(data = Gorriones[,c("L.Total", "Vivo.Muerto")], aes(x = Vivo.Muerto, y = L.Total, fill = Vivo.Muerto)) + geom_boxplot()
+g2 = ggplot(data = Gorriones[,c("E.Alar", "Vivo.Muerto")], aes(x = Vivo.Muerto, y = E.Alar, fill = Vivo.Muerto)) + geom_boxplot()
+g3 = ggplot(data = Gorriones[,c("L.Pico.y.Cabeza", "Vivo.Muerto")], aes(x = Vivo.Muerto, y = L.Pico.y.Cabeza, fill = Vivo.Muerto)) + geom_boxplot()
+g4 = ggplot(data = Gorriones[,c("L.Húmero", "Vivo.Muerto")], aes(x = Vivo.Muerto, y = L.Húmero, fill = Vivo.Muerto)) + geom_boxplot()
+g5 = ggplot(data = Gorriones[,c("L.Quilla.Esternón", "Vivo.Muerto")], aes(x = Vivo.Muerto, y = L.Quilla.Esternón, fill = Vivo.Muerto)) + geom_boxplot()
+multiplot(g1, g2, g3, g4, g5, layout = matrix(c(1,1,2,2,3,3,4,4,4,5,5,5), byrow = T, ncol = 6))
+```
+
 #### ii. Compare los vectores medios de ambos grupos. Tiene sentido realizar un análisis discriminante?
 
+```{r}
+kable(describeBy(Gorriones, group = "Vivo.Muerto", mat = T)[1:10,c("group1", "mean")], align = "c")
+```
+
 #### iii. Realice el análisis discriminante a partir de las variables que considere adecuada. incluir.
+
+```{r}
+modelo1 = train(Vivo.Muerto ~ L.Total + E.Alar, data = Gorriones[,c("Vivo.Muerto", "L.Total", "E.Alar")], method = "lda")
+summary(modelo1)
+str(modelo1)
+```
+
+
 
 #### iv. Satisface los supuestos del modelo?. Resulta una buena clasificación?.
 
@@ -47,6 +85,7 @@ El archivo de datos hemofilia.xls contiene 74 registros de pacientes sobre los c
 
 ```{r}
 Hemofilia = read_excel("hemofilia.xls")
+kable(head(Hemofilia), align = "c")
 ```
 
 #### a. ¿Considera que ambas variables pueden ser de ayuda para esta clasificación?
@@ -68,6 +107,7 @@ Los datos del archivo pulso.idb contienen el pulso antes de realizar un ejercici
 
 ```{r}
 Pulso = read_excel("pulso.xls")
+kable(head(Pulso), align = "c")
 ```
 
 ####a- Interesa saber si la información del pulso antes y después de correr permite discriminar el sexo.
@@ -78,7 +118,7 @@ Pulso = read_excel("pulso.xls")
 
 
 
-##Ejercicio 4
+#Ejercicio 4
 
 La base de datos IRIS.TXT contiene 150 registros correspondientes a 3 especies de la flor Iris. Los datos
 pertenecen a un clásico ejemplo debido a Fisher (1936). El objetivo consiste en clasificar estas subespecies a
@@ -88,6 +128,7 @@ partir de las 4 variables que incluyen medidas del sépalo y del pétalo de cada
 
 ```{r}
 Iris = read.table("Iris.txt", header = T, dec = ",")
+kable(head(Iris), align = "c")
 ```
 
 #### i. Analice cuales valores medios son diferentes en las especies.
@@ -100,7 +141,7 @@ Iris = read.table("Iris.txt", header = T, dec = ",")
 
 
 
-##Ejercicio 5
+#Ejercicio 5
 
 La base de datos BAROTRO2.DAT consiste en 37 registros geoposicionales que informan sobre las coordenadas en las cuales 37 tormentas se transformaron en huracanes, para 2 clasificaciones de huracanes: Baro y Trop.
 Estos datos son ficticios y pertenecen a Elsner, Lehmiller, and Kimberlain (1996).
@@ -109,6 +150,7 @@ Estos datos son ficticios y pertenecen a Elsner, Lehmiller, and Kimberlain (1996
 
 ```{r}
 Barotro = read.table("Barotro2.dat", header = T, dec = ",")
+kable(head(Barotro), align = "c")
 ```
 
 #### i. Realice un análisis discriminante teniendo como objetivo la clasificación de los huracanes.

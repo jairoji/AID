@@ -3,6 +3,5 @@ account: rpubs
 server: rpubs.com
 bundleId:
         https://api.rpubs.com/api/v1/document/90823/d711a93a0a904a6c908dd90ee31917d9
-url:
-        http://rpubs.com/publish/claim/90823/4d212317df02497086e75ecbedcfce00
-when: 1435869854.99609
+url: http://rpubs.com/jairoji/90823
+when: 1436213271.0912
